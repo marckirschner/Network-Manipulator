@@ -85,10 +85,11 @@ sub powerNPUniform {
 	my $counter=0;
 	my %usedIdx;
 	my $nlSize = scalar(@$nl);
-	
+	my $a=0;
 	while ($counter<int($nd*$nlSize)) {
 		# This operation may be optimized by first building a structure of just the types we want to select from
-		
+	#	print "$a, $counter\n";
+		$a++;
 		my $prob = rand(1);
 		my $i = int(rand($nlSize-1));
 		
@@ -97,7 +98,7 @@ sub powerNPUniform {
 			$usedIdx{$i} = 1;
 			$counter++;
 		
-			$this->distributePowerUniform($nl->[$i], $network, $pwr);
+			$this->distributePowerUniform($nl->[$i], $network, $pwr, $label);
 		}		
 	}
 }
@@ -119,7 +120,7 @@ sub powerNPProportional {
 		 	 $nd > $prob && !defined($usedIdx{$i})	) {
 				$usedIdx{$i} = 1;
 				$counter++;
-				$this->distributePowerProportional($nl->[$i],$network, $pwr);
+				$this->distributePowerProportional($nl->[$i],$network, $pwr, $label);
 			}		
 	}
 }
@@ -145,12 +146,12 @@ sub powerNPTest {
 }
 ###################### UTILITES GO HERE ###########
 sub distributePowerUniform {
-	my ($this, $node,$network, $pwr) = @_;
+	my ($this, $node,$network, $pwr, $label) = @_;
 
 	# First assumme uniform power
 	my $uniformPower = $network->power() / $this->network()->size();
 	$node->power($uniformPower);
-	$node->type('$6');
+	$node->type($label);
 	
 	my $nl = $this->network()->nodeList();
 	foreach my $nd (@{$nl}) {
@@ -162,7 +163,7 @@ sub distributePowerUniform {
 }
 
 sub distributePowerProportional {
-	my ($this, $node,$network, $pwr) = @_;
+	my ($this, $node,$network, $pwr, $label) = @_;
 	
 	my $distNodeLoadSum=0;
 	my $nl = $this->network()->nodeList();
@@ -176,7 +177,7 @@ sub distributePowerProportional {
 	my $proportionalPower = $network->power()*$proportionality;
 	
 	$node->power($proportionalPower);
-	$node->type('$6');
+	$node->type($label);
 	
 	foreach my $nd (@{$nl}) {
 		if ($nd->type() eq '$2' || $nd->type() eq '$3') {

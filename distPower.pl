@@ -39,20 +39,19 @@ sub main
 	my $netB = NetworkBuilder->new();
 	my $k = $netB->build($nb->nodeList());
 
-	# Distribute energy to some nodes
-	my $na = NodeAccessor->new();
-	$na->network($k);
-	my $ntm = NetworkModifier->new();
-	
-	print Dumper($config);
-	
 	foreach my $rule (@{$config->{rule}}) {
+		my $na = NodeAccessor->new();
+		$na->network($k);
+		my $ntm = NetworkModifier->new();
+		
 		if ($rule->{type} eq 'buildRegion') {
 			my ($x1,$x2,$y1,$y2) = split(',', $rule->{region}->{range});
 			my $power = $rule->{region}->{power};
 			my $node = $rule->{region}->{node};
 			my $distType = $rule->{region}->{distType};
 			my $label = $rule->{region}->{label};
+			my $accessorType = $rule->{region}->{accessorType};
+			
 			my $callback="";
 			
 			if ($distType eq 'proportional') {
@@ -63,10 +62,19 @@ sub main
 				$callback = "powerNPUniform";
 			}
 			
-			my $region = $na->coordinateAccessor(int($x1),int($x2),int($y1),int($y2));
+			my $region = $na->coordinateAccessor(int($x1),int($x2),int($y1),int($y2),$accessorType);
+			my $regionSize = scalar(@{$region->nodeList()});
+			if ($regionSize ==0) {
+				print "Empty Region: $x1,$x2,$y1,$y2 : $power $node : $distType : $label\n";
+				exit;
+			} else {
+				print "Region Size $regionSize: $x1,$x2,$y1,$y2 : $power $node : $distType : $label\n";
+			}
+			
 			$ntm->network($region);
 			$ntm->callback($callback, [$k, $power, $node, $label] );
 			$ntm->modify();
+		
 			# Merge the networks
 			$k->merge($region);
 		}
@@ -75,8 +83,7 @@ sub main
 			my ($x1,$x2,$y1,$y2) = split(',', $rule->{zone}->{range});
 			my $name = $rule->{zone}->{name};
 			my $callback = "createZone";
-			
-			
+						
 			my $region = $na->coordinateAccessor(int($x1),int($x2),int($y1),int($y2));
 			$ntm->network($region);
 			
@@ -86,7 +93,6 @@ sub main
 			$k->merge($region);
 		}
 	}
-
 
 	my $text = $k->toRestartFile($rf)->toString();
 	print $text;
