@@ -1,0 +1,36 @@
+<Network>
+<rule type="buildRegion">
+	<region>
+		<range>0,100,0,100</range>
+		<power>0.7</power>
+		<node>0.3</node>
+		<distType>uniform</distType>
+		<label>$6</label>
+	</region>
+</rule>
+
+<rule type="buildRegion">
+	<region>
+		<range>100,200,100,200</range>
+		<power>0.2</power>
+		<node>0.3</node>
+		<distType>uniform</distType>
+		<label>$9</label>
+	</region>
+</rule>
+
+<rule type="buildZone">
+	<zone>
+		<range>0,100,0,100</range>
+		<name>A</name>
+	</zone>
+</rule>
+
+<rule type="buildZone">
+	<zone>
+		<range>100,200,100,200</range>
+		<name>J</name>
+	</zone>
+</rule>
+
+</Network>
