@@ -9,16 +9,6 @@
 	</region>
 </rule>
 
-<rule type="buildRegion">
-	<region>
-		<range>100,200,100,200</range>
-		<power>0.2</power>
-		<node>0.3</node>
-		<distType>uniform</distType>
-		<label>$9</label>
-	</region>
-</rule>
-
 <rule type="buildZone">
 	<zone>
 		<range>0,100,0,100</range>
@@ -28,7 +18,7 @@
 
 <rule type="buildZone">
 	<zone>
-		<range>100,200,100,200</range>
+		<range>100,400,100,400</range>
 		<name>J</name>
 	</zone>
 </rule>
