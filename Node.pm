@@ -12,6 +12,8 @@ has 'y' => (isa => 'Num', is=> 'rw');
 has 'type' => (isa => 'Str', is=> 'rw');
 has 'name' => (isa => 'Str', is=> 'rw');
 has 'idx'=>(isa=>'Num', is =>'rw');
+has 'region' =>(isa=>'Str', is=>'rw');
+has 'zone' =>(isa=>'Str', is=>'rw');
 
 
 sub points {

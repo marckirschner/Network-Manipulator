@@ -62,6 +62,9 @@ sub toRestartFile {
 	return $rf2;
 }
 
+
+
+### Havent yet tested These. #########################
 sub maxX() {
 	my ($this) = @_;
 	my $nl = $this->nodeList();

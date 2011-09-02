@@ -24,8 +24,6 @@ sub build {
 		$n->power($cn->[3]);
 		$n->name($cn->[4]);
 		$n->idx($i);
-		
-	#	print Dumper($restartFile->getConnections($i));
 
 		$n->conListById( $restartFile->getConnections($i) );
 		$n->points($restartFile->getCoords($i));
@@ -35,9 +33,5 @@ sub build {
 	
 	$this->nodeList($list);
 }
-
-
-
-
 
 1;

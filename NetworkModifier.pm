@@ -62,6 +62,12 @@ sub initRuleMap {
 		'createZone' => {	'func'=> \&createZone,
 							'args'=>[]
 						 		},		
+		'applyRegion'	=> {	'func'=> \&applyRegion,
+							'args'=>[]
+						 		},
+		'applyZone'	=> {	'func'=> \&applyZone,
+						'args'=>[]
+			 		},
 
 	};
 	
@@ -70,6 +76,23 @@ sub initRuleMap {
 }
 
 ###################### IMPLEMENT RULES HERE #############
+
+sub applyRegion {
+	my ($this, $region) = @_;
+		my $nl = $this->network()->nodeList();
+		foreach my $nd (@{$nl}) {
+			$nd->region($region);
+		}
+}
+
+
+sub applyZone {
+	my ($this, $zone) = @_;
+		my $nl = $this->network()->nodeList();
+		foreach my $nd (@{$nl}) {
+			$nd->zone($zone);
+		}
+}
 
 # For the nodes in this network, take a percent $pwr of the total power from network $network 
 # and distribute that power to a percent $nd of the number of nodes in this network. Then change 
@@ -99,8 +122,16 @@ sub powerNPUniform {
 			$counter++;
 		
 			$this->distributePowerUniform($nl->[$i], $network, $pwr, $label);
+		
 		}		
 	}
+		my $nl = $this->network()->nodeList();
+		foreach my $nd (@{$nl}) {
+
+			if ($nd->type() eq '$2' || $nd->type() eq '$3') {
+				$nd->power($nd->power()*(1-$pwr));
+			}
+		}
 }
 ## LOOK OUT : CODE DUPLICATION
 sub powerNPProportional {
@@ -123,6 +154,14 @@ sub powerNPProportional {
 				$this->distributePowerProportional($nl->[$i],$network, $pwr, $label);
 			}		
 	}
+	
+		my $nl = $this->network()->nodeList();
+		foreach my $nd (@{$nl}) {
+
+			if ($nd->type() eq '$2' || $nd->type() eq '$3') {
+				$nd->power($nd->power()*(1-$pwr));
+			}
+		}
 }
 
 sub createZone {
@@ -153,13 +192,7 @@ sub distributePowerUniform {
 	$node->power($uniformPower);
 	$node->type($label);
 	
-	my $nl = $this->network()->nodeList();
-	foreach my $nd (@{$nl}) {
-	
-		if ($nd->type() eq '$2' || $nd->type() eq '$3') {
-			$nd->power($nd->power()*(1-$pwr));
-		}
-	}
+
 }
 
 sub distributePowerProportional {
@@ -178,12 +211,6 @@ sub distributePowerProportional {
 	
 	$node->power($proportionalPower);
 	$node->type($label);
-	
-	foreach my $nd (@{$nl}) {
-		if ($nd->type() eq '$2' || $nd->type() eq '$3') {
-			$nd->power($nd->power()*(1-$pwr));
-		}
-	}
 }
 
  

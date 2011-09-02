@@ -26,6 +26,8 @@ sub main
 			exit;
 	}
 	
+	my %checks={region=>0,zone=>0};
+	
 	# Parse the config file
 	my $config = XMLin($param{config});
 	
@@ -45,6 +47,7 @@ sub main
 		my $ntm = NetworkModifier->new();
 		
 		if ($rule->{type} eq 'buildRegion') {
+			$checks{region} = 1;
 			my ($x1,$x2,$y1,$y2) = split(',', $rule->{region}->{range});
 			my $power = $rule->{region}->{power};
 			my $node = $rule->{region}->{node};
@@ -72,6 +75,7 @@ sub main
 			}
 			
 			$ntm->network($region);
+			$ntm->callback("applyRegion",[$rule->{region}->{range}]);
 			$ntm->callback($callback, [$k, $power, $node, $label] );
 			$ntm->modify();
 		
@@ -80,6 +84,7 @@ sub main
 		}
 		
 		if ($rule->{type} eq 'buildZone') {
+			$checks{region} = 1;
 			my ($x1,$x2,$y1,$y2) = split(',', $rule->{zone}->{range});
 			my $name = $rule->{zone}->{name};
 			my $callback = "createZone";
@@ -87,10 +92,29 @@ sub main
 			my $region = $na->coordinateAccessor(int($x1),int($x2),int($y1),int($y2));
 			$ntm->network($region);
 			
+			$ntm->callback("applyZone",[$rule->{zone}->{name}]);
 			$ntm->callback($callback, [$name] );
 			$ntm->modify();
 			# Merge the networks
 			$k->merge($region);
+		}
+	}
+	
+	if ($checks{region}) {
+		my $nl = $k->nodeList();
+		foreach my $nd (@$nl) {
+			if (!defined($nd->region()) || $nd->region() eq "") {
+				die "Error: Regions are defined in the config file but not all nodes belong to a region.\n";
+			}
+		}
+	}
+	
+	if ($checks{zone}) {
+		my $nl = $k->nodeList();
+		foreach my $nd (@$nl) {
+			if (!defined($nd->zone()) || $nd->zone() eq "") {
+				die "Error: Zones are defined in the config file but not all nodes belong to a zone.\n";
+			}
 		}
 	}
 
