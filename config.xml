@@ -2,6 +2,7 @@
 
 <rule type="buildRegion">
 	<region>
+		<objectType>region</objectType>
 		<range>0,100,0,100</range>
 		<power>0.7</power>
 		<node>0.3</node>
@@ -13,6 +14,7 @@
 
 <rule type="buildRegion">
 	<region>
+		<objectType>region</objectType>
 		<range>100,400,100,400</range>
 		<power>0.2</power>
 		<node>0.9</node>
@@ -24,6 +26,7 @@
 
 <rule type="buildZone">
 	<zone>
+		<objectType>zone</objectType>
 		<range>0,100,0,100</range>
 		<name>A</name>
 	</zone>
@@ -31,6 +34,7 @@
 
 <rule type="buildZone">
 	<zone>
+		<objectType>zone</objectType>
 		<range>100,400,100,400</range>
 		<name>J</name>
 	</zone>

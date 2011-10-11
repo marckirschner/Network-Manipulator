@@ -8,6 +8,7 @@ use NetworkBuilder;
 use NodeAccessor;
 use NetworkModifier;
 use XML::Simple;
+use IO::File;
 no warnings;
 
 main();
@@ -54,6 +55,7 @@ sub main
 			my $distType = $rule->{region}->{distType};
 			my $label = $rule->{region}->{label};
 			my $accessorType = $rule->{region}->{accessorType};
+			my $objectType = $rule->{region}->{objectType};
 			
 			my $callback="";
 			
@@ -77,6 +79,7 @@ sub main
 			$ntm->network($region);
 			$ntm->callback("applyRegion",[$rule->{region}->{range}]);
 			$ntm->callback($callback, [$k, $power, $node, $label] );
+			$ntm->callback("setObjectType", [$objectType]);
 			$ntm->modify();
 		
 			# Merge the networks
@@ -104,7 +107,7 @@ sub main
 		my $nl = $k->nodeList();
 		foreach my $nd (@$nl) {
 			if (!defined($nd->region()) || $nd->region() eq "") {
-				die "Error: Regions are defined in the config file but not all nodes belong to a region.\n";
+				print "Error: Regions are defined in the config file but not all nodes belong to a region.\n";
 			}
 		}
 	}
@@ -113,12 +116,45 @@ sub main
 		my $nl = $k->nodeList();
 		foreach my $nd (@$nl) {
 			if (!defined($nd->zone()) || $nd->zone() eq "") {
-				die "Error: Zones are defined in the config file but not all nodes belong to a zone.\n";
+				print "Error: Zones are defined in the config file but not all nodes belong to a zone.\n";
 			}
 		}
 	}
 
 	my $text = $k->toRestartFile($rf)->toString();
 	print $text;
+	
+	createRegionFile($k, "RegionFile.txt");
+	
+	
+	# Create Node File
+	
+}
+
+
+sub createRegionFile {
+	my ($network, $fileName) = @_;
+
+	die "Undefined Network" unless defined $network;
+	die "Undefined file name" unless defined $fileName;
+	
+	my $nl = $network->nodeList();
+	
+	die "Node List undefined" unless defined $nl;
+	
+	my $fh = new IO::File "> $fileName";
+    if (defined $fh) {
+        foreach my $n (@$nl) {
+			my $line = "";
+			if (defined $n->objectType() && $n->objectType eq "region") {
+				my $line = "".$n->type() . "\t" . substr($n->name(), 1);
+				print $fh $line . "\n";		
+				my $pos = $fh->getpos;
+		        $fh->setpos($pos);
+			}
+		}
+        undef $fh;       # automatically closes the file
+    }
+ 
 }
 

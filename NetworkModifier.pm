@@ -68,6 +68,10 @@ sub initRuleMap {
 		'applyZone'	=> {	'func'=> \&applyZone,
 						'args'=>[]
 			 		},
+		'setObjectType'	=> {
+							'func'=> \&setObjectType,
+							'args'=>[]
+		 		},
 
 	};
 	
@@ -91,6 +95,14 @@ sub applyZone {
 		my $nl = $this->network()->nodeList();
 		foreach my $nd (@{$nl}) {
 			$nd->zone($zone);
+		}
+}
+
+sub setObjectType {
+	my ($this, $objectType) = @_;
+		my $nl = $this->network()->nodeList();
+		foreach my $nd (@{$nl}) {
+			$nd->objectType($objectType);
 		}
 }
 
@@ -125,7 +137,7 @@ sub powerNPUniform {
 		
 		}		
 	}
-		my $nl = $this->network()->nodeList();
+		#my $nl = $this->network()->nodeList();
 		foreach my $nd (@{$nl}) {
 
 			if ($nd->type() eq '$2' || $nd->type() eq '$3') {
@@ -155,7 +167,7 @@ sub powerNPProportional {
 			}		
 	}
 	
-		my $nl = $this->network()->nodeList();
+		#my $nl = $this->network()->nodeList();
 		foreach my $nd (@{$nl}) {
 
 			if ($nd->type() eq '$2' || $nd->type() eq '$3') {

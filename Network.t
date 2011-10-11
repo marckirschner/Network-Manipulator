@@ -63,6 +63,9 @@ ok (defined $rf2, 'Network to RestartFile operation produced a defined object');
 my $text = $rf2->toString();
 ok (defined $text, 'RestartFile to String operation produced a defined object');
 
+my $n_hello = Node->new();
+$n_hello->objectType("HelloWorld");
+is($n_hello->objectType(), "HelloWorld", "Node has objectType property");
 
 
 
