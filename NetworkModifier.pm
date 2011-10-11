@@ -99,10 +99,17 @@ sub applyZone {
 }
 
 sub setObjectType {
-	my ($this, $objectType) = @_;
+	my ($this, $objectType, $labelList) = @_;
+	
+		my %labelHash;
+		foreach (@$labelList) {
+			$labelHash{$_} = 1;
+		}
 		my $nl = $this->network()->nodeList();
 		foreach my $nd (@{$nl}) {
-			$nd->objectType($objectType);
+			if (defined($labelHash{$nd->type()})) {
+				$nd->objectType($objectType);
+			}
 		}
 }
 

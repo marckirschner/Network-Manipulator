@@ -79,7 +79,7 @@ sub main
 			$ntm->network($region);
 			$ntm->callback("applyRegion",[$rule->{region}->{range}]);
 			$ntm->callback($callback, [$k, $power, $node, $label] );
-			$ntm->callback("setObjectType", [$objectType]);
+			$ntm->callback("setObjectType", [$objectType, ['$6', '$9'] ]);
 			$ntm->modify();
 		
 			# Merge the networks
