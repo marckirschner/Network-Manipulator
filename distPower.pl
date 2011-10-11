@@ -56,6 +56,7 @@ sub main
 			my $label = $rule->{region}->{label};
 			my $accessorType = $rule->{region}->{accessorType};
 			my $objectType = $rule->{region}->{objectType};
+			my $regionLabel = $rule->{region}->{regionLabel};
 			
 			my $callback="";
 			
@@ -80,6 +81,7 @@ sub main
 			$ntm->callback("applyRegion",[$rule->{region}->{range}]);
 			$ntm->callback($callback, [$k, $power, $node, $label] );
 			$ntm->callback("setObjectType", [$objectType, ['$6', '$9'] ]);
+			$ntm->callback("setRegionLabel", [$regionLabel] );
 			$ntm->modify();
 		
 			# Merge the networks
@@ -147,7 +149,7 @@ sub createRegionFile {
         foreach my $n (@$nl) {
 			my $line = "";
 			if (defined $n->objectType() && $n->objectType eq "region") {
-				my $line = "".$n->type() . "\t" . substr($n->name(), 1);
+				my $line = substr($n->name(), 1) ." ". $n->regionLabel() . " ". $n->type() ;
 				print $fh $line . "\n";		
 				my $pos = $fh->getpos;
 		        $fh->setpos($pos);

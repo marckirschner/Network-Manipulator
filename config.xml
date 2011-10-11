@@ -9,6 +9,7 @@
 		<distType>uniform</distType>
 		<label>$6</label>
 		<accessorType>$1</accessorType>
+		<regionLabel>R1</regionLabel>
 	</region>
 </rule>
 
@@ -19,8 +20,9 @@
 		<power>0.2</power>
 		<node>0.9</node>
 		<distType>proportional</distType>
-		<label>$9</label>
+		<label>$6</label>
 		<accessorType>$1</accessorType>
+		<regionLabel>R2</regionLabel>
 	</region>
 </rule>
 

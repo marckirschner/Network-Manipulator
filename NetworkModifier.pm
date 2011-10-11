@@ -72,6 +72,10 @@ sub initRuleMap {
 							'func'=> \&setObjectType,
 							'args'=>[]
 		 		},
+					'setRegionLabel'	=> {
+										'func'=> \&setRegionLabel,
+										'args'=>[]
+					 		},
 
 	};
 	
@@ -111,6 +115,15 @@ sub setObjectType {
 				$nd->objectType($objectType);
 			}
 		}
+}
+
+sub setRegionLabel {
+		my ($this, $regionLabel) = @_;
+			my $nl = $this->network()->nodeList();
+			foreach my $nd (@{$nl}) {
+					$nd->regionLabel($regionLabel);
+				
+			}
 }
 
 # For the nodes in this network, take a percent $pwr of the total power from network $network 
