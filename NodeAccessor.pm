@@ -8,22 +8,33 @@ has 'network' => (isa=>'Object', is=>'rw');
 has 'nb' => (isa=>'Object', is=>'rw'); # Research get rid of this.
 
 sub coordinateAccessor {
-	my ($this, $x1,$x2,$y1,$y2, $type ) = @_;
+	my ($this, $x1,$y1,$x2,$y2, $type ) = @_;
 
 	# loop thru networks
 	my $returnNet=[];
 	my $nodeList = $this->network()->nodeList();
 
 	foreach (@$nodeList) {
+			if ($_->x() == 350 && $_->y() == 291) {
+				print "Located ". $_->name() .  "\n";
+			}
 		if (!defined($type)) {
-			if ($x1 <= $_->x() && $_->x() <= $x2 &&
-				$y1 <= $_->y() && $_->y() <= $y2) {
+			#if ($x1 <= $_->x() && $_->x() <= $x2 &&
+			#	$y1 <= $_->y() && $_->y() <= $y2) {
+			if ($_->x() == 350 && $_->y() == 291) {
+				print "Comparing " . $_->x() . ", " . $_->y() . " with " . "$x1,$y1 - $x2,$y2" . "\n";
+			}
+			if ($x1 <= $_->x() && $y1 <= $_->y() &&
+				 $_->x() <= $x2 && $_->y() <= $y2) {	
+				 	if ($_->x() == 350 && $_->y() == 291) {
+				print "Createing a network with" . $_->name() . "\n";
+			}
 					push @$returnNet, $_;
 			} 
 		} else {
-				if( ($x1 <= $_->x() && $_->x() <= $x2 &&
-					$y1 <= $_->y() && $_->y() <= $y2) && 
-					$_->type() eq $type) {
+				if( ($x1 <= $_->x() && $y1 <= $_->y() &&
+					 $_->x() <= $x2 && $_->y() <= $y2) && 
+					$_->type() eq $type) { # More selective only grab those in a rectangle whose type is $type
 						push @$returnNet, $_;
 				}
 		}

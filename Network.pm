@@ -11,6 +11,7 @@ has 'conMatrix' => (isa=>'HashRef', is=>'rw');
 has 'power' => (isa => 'Num', is=>'rw');
 
 #TODO: add getWithX, getWithY, getWithXY - will have to build map of coordinates to nodes
+
 sub size {
 	my ($this) = @_;
 	return scalar(@{$this->nodeList});
@@ -25,6 +26,90 @@ sub merge {
 	foreach my $node (@$nl) {
 		$myNodeList->[$node->idx()] = $node;
 	}
+}
+
+sub hasNode {
+	my ($this, $param)	= @_;
+
+	print Dumper($param);
+	my $myNodeList = $this->nodeList();
+	
+	foreach my $nd (@{$myNodeList}) {
+		my $bool=0;
+		foreach my $p (keys %{$param}) {
+			if ($p eq "x") {
+				if ($nd->x() == int($param->{$p})) {
+					$bool = 1;
+				} else {
+					$bool = 0;
+				}
+			}
+
+
+			if ($p eq "y") {
+				if ($nd->y() == int($param->{$p})) {
+					$bool = 1;
+				} else {
+					$bool = 0;
+				}
+			}
+
+
+			if ($p eq "name") {
+				if ($nd->name() eq $param->{$p}) {
+					$bool = 1;
+				} else {
+					$bool = 0;
+				}
+			}
+		}
+		if ($bool == 1) {
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+sub getNode() {
+	my ($this, $param)	= @_;
+
+	print Dumper($param);
+	my $myNodeList = $this->nodeList();
+	
+	foreach my $nd (@{$myNodeList}) {
+		my $bool=0;
+		foreach my $p (keys %{$param}) {
+			if ($p eq "x") {
+				if ($nd->x() == int($param->{$p})) {
+					$bool = 1;
+				} else {
+					$bool = 0;
+				}
+			}
+
+			if ($p eq "y") {
+				if ($nd->y() == int($param->{$p})) {
+					$bool = 1;
+				} else {
+					$bool = 0;
+				}
+			}
+
+			if ($p eq "name") {
+				if ($nd->name() eq $param->{$p}) {
+					$bool = 1;
+				} else {
+					$bool = 0;
+				}
+			}
+		}
+		if ($bool == 1) {
+			return $nd;
+		}
+	}
+
+	return undef;
 }
 
 sub toRestartFile {
@@ -61,7 +146,6 @@ sub toRestartFile {
 	$rf2->coords($coords);
 	return $rf2;
 }
-
 
 
 ### Havent yet tested These. #########################

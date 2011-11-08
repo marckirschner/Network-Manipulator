@@ -49,7 +49,8 @@ sub main
 		
 		if ($rule->{type} eq 'buildRegion') {
 			$checks{region} = 1;
-			my ($x1,$x2,$y1,$y2) = split(',', $rule->{region}->{range});
+			
+			my ($x1,$y1,$x2,$y2) = split(',', $rule->{region}->{range});
 			my $power = $rule->{region}->{power};
 			my $node = $rule->{region}->{node};
 			my $distType = $rule->{region}->{distType};
@@ -62,24 +63,44 @@ sub main
 			
 			if ($distType eq 'proportional') {
 				$callback = "powerNPProportional"
-			}
-			
+			} 
 			if ($distType eq 'uniform') {
 				$callback = "powerNPUniform";
 			}
 			
-			my $region = $na->coordinateAccessor(int($x1),int($x2),int($y1),int($y2),$accessorType);
+			my $region = $na->coordinateAccessor(int($x1),int($y1),int($x2),int($y2),$accessorType);
+
+=me 
+Example of how to use hasNode and getNode
+TODO: Delete this comment once this code is documented and tests are written
+				if ($k->hasNode({x => 350, 
+					 y => 291,
+					 name => "n4"}))  
+				{
+					my $nd = $k->getNode({x => 350, y => 291, name => "n4"});
+
+					print "WE FOUND THE NODE IN A REGION!\n";
+					print "It's " .  $nd->type() . "\n";
+				} else {
+					print "NOPE!\n";
+				}
+=cut
+
 			my $regionSize = scalar(@{$region->nodeList()});
 			if ($regionSize ==0) {
-				print "Empty Region: $x1,$x2,$y1,$y2 : $power $node : $distType : $label\n";
+				print "Empty Region: $x1,$y1,$x2,$y2 : $power $node : $distType : $label\n";
 				exit;
 			} else {
-				print "Region Size $regionSize: $x1,$x2,$y1,$y2 : $power $node : $distType : $label\n";
+				print "Region Size $regionSize: $x1,$y1,$x2,$y2 : $power $node : $distType : $label\n";
 			}
 			
 			$ntm->network($region);
 			$ntm->callback("applyRegion",[$rule->{region}->{range}]);
-			$ntm->callback($callback, [$k, $power, $node, $label] );
+
+			if ($callback ne "") {
+				$ntm->callback($callback, [$k, $power, $node, $label] );
+			}
+
 			$ntm->callback("setObjectType", [$objectType, ['$6', '$9'] ]);
 			$ntm->callback("setRegionLabel", [$regionLabel] );
 			$ntm->modify();
@@ -94,7 +115,7 @@ sub main
 			my $name = $rule->{zone}->{name};
 			my $callback = "createZone";
 						
-			my $region = $na->coordinateAccessor(int($x1),int($x2),int($y1),int($y2));
+			my $region = $na->coordinateAccessor(int($x1),int($y1),int($x2),int($y2));
 			$ntm->network($region);
 			
 			$ntm->callback("applyZone",[$rule->{zone}->{name}]);
@@ -109,7 +130,7 @@ sub main
 		my $nl = $k->nodeList();
 		foreach my $nd (@$nl) {
 			if (!defined($nd->region()) || $nd->region() eq "") {
-				print "Error: Regions are defined in the config file but not all nodes belong to a region.\n";
+				die "Error: Regions are defined in the config file but not all nodes belong to a region.\n";
 			}
 		}
 	}
@@ -118,16 +139,22 @@ sub main
 		my $nl = $k->nodeList();
 		foreach my $nd (@$nl) {
 			if (!defined($nd->zone()) || $nd->zone() eq "") {
-				print "Error: Zones are defined in the config file but not all nodes belong to a zone.\n";
+				die "Error: Zones are defined in the config file but not all nodes belong to a zone.\n";
 			}
 		}
 	}
 
 	my $text = $k->toRestartFile($rf)->toString();
+
+	# Place in DEBUG log	
 	print $text;
+
+	# Put somewhere else
+	open FILE, ">RESTARTFILE_NEW.txt";
+	print FILE $text;
+	close FILE;
 	
 	createRegionFile($k, "RegionFile.txt");
-	
 	
 	# Create Node File
 	
