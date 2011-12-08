@@ -13,8 +13,20 @@ has 'power' => (isa => 'Num', is=>'rw');
 #TODO: add getWithX, getWithY, getWithXY - will have to build map of coordinates to nodes
 
 sub size {
-	my ($this) = @_;
-	return scalar(@{$this->nodeList});
+	my ($this, $type) = @_;
+	if (!defined($type)) {
+		return scalar(@{$this->nodeList});
+	} else {
+		my $size=0;
+		foreach (@{$this->nodeList}) {
+			if ($_->type() eq $type){
+				$size++;
+			}
+		}
+
+		$size++;
+	}
+	
 }
 
 sub merge {

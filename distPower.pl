@@ -101,6 +101,10 @@ TODO: Delete this comment once this code is documented and tests are written
 				$ntm->callback($callback, [$k, $power, $node, $label] );
 			}
 
+			# The object Type is a classification (Which should be a structure of it's own to abstract away properties)
+			# Objecttype can be anything. Currently I am seeting the object type to be 'region'
+			# So therefore multiple node types $6, $9, etc, can have a common object type associating them
+
 			$ntm->callback("setObjectType", [$objectType, ['$6', '$9'] ]);
 			$ntm->callback("setRegionLabel", [$regionLabel] );
 			$ntm->modify();
@@ -144,10 +148,11 @@ TODO: Delete this comment once this code is documented and tests are written
 		}
 	}
 
-	my $text = $k->toRestartFile($rf)->toString();
+	#print "ASLKDJASLKDJASD";
 
+	my $text = $k->toRestartFile($rf)->toString();
 	# Place in DEBUG log	
-	print $text;
+	#print $text;
 
 	# Put somewhere else
 	open FILE, ">RESTARTFILE_NEW.txt";
