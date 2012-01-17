@@ -12,6 +12,17 @@ has 'power' => (isa => 'Num', is=>'rw');
 
 #TODO: add getWithX, getWithY, getWithXY - will have to build map of coordinates to nodes
 
+sub getPower {
+	my ($this) = @_;
+	my $sum = 0; 
+	foreach my $node (@{$this->nodeList()}) {
+
+		$sum += $node->power();
+	}
+
+	return $sum;
+}
+
 sub size {
 	my ($this, $type) = @_;
 	if (!defined($type)) {

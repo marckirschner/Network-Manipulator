@@ -42,6 +42,19 @@ sub main
 	my $netB = NetworkBuilder->new();
 	my $k = $netB->build($nb->nodeList());
 
+	print "Initial Network Parameters\n";
+
+	my $nodeList = $k->nodeList();
+
+	#print Dumper($k->nodeList());
+
+#	foreach my $n (@$nodeList) {
+#		if ($n->type() eq '$1') {
+#			print "Node Power = " . $n->power() . "\n";
+#		}
+#	}
+
+
 	foreach my $rule (@{$config->{rule}}) {
 		my $na = NodeAccessor->new();
 		$na->network($k);
@@ -107,10 +120,16 @@ TODO: Delete this comment once this code is documented and tests are written
 
 			$ntm->callback("setObjectType", [$objectType, ['$6', '$9'] ]);
 			$ntm->callback("setRegionLabel", [$regionLabel] );
+			
+			my $str =  "THE TOTAL NETWORK POWER BEFORE: " . $k->getPower() . "\n";
 			$ntm->modify();
-		
+			
+			print $str;
+			print "THE TOTAL REGION POWER: " . $region->getPower() . "\n";
+			
 			# Merge the networks
 			$k->merge($region);
+			print "THE TOTAL NETWORK POWER AFTER: " . $k->getPower() . "\n";
 		}
 		
 		if ($rule->{type} eq 'buildZone') {
@@ -148,8 +167,6 @@ TODO: Delete this comment once this code is documented and tests are written
 		}
 	}
 
-	#print "ASLKDJASLKDJASD";
-
 	my $text = $k->toRestartFile($rf)->toString();
 	# Place in DEBUG log	
 	#print $text;
@@ -182,7 +199,7 @@ sub createRegionFile {
 			my $line = "";
 			if (defined $n->objectType() && $n->objectType eq "region") {
 				my $line = substr($n->name(), 1) ." ". $n->regionLabel() . " ". $n->type() ;
-				print $fh $line . "\n";		
+				#print $fh $line . "\n";		
 				my $pos = $fh->getpos;
 		        $fh->setpos($pos);
 			}

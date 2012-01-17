@@ -7,6 +7,9 @@ has 'ruleList' => (isa=>'ArrayRef', is=>'rw');
 has 'network' => (isa=>'Object', is=>'rw');
 has 'ruleMap' => (isa=>'HashRef', is=>'rw');
 
+my $totalSumPowerSubtracted=0;
+my $totalSumPowerAdded=0;
+
 sub BUILD {
 	my ($this) = @_;
 	$this->initRuleMap();
@@ -144,9 +147,15 @@ sub powerNPUniform {
 
 	my $distSize = $this->network()->size('$1');
 
+	print "Number of Q = " . $distSize . "\n";
+	print "Number of nl = " . $nlSize . "\n";
+	print "Diff = " . ($nlSize - $distSize) . "\n";
+
+	print "TOTAL = " . ($this->network()->size('$1')+$this->network()->size('$3')) . "\n";
+
 	while ($counter<int($nodeFrac*$nlSize)) {
+	#while ($counter < int($nodeFrac*$distSize)) {
 		# This operation may be optimized by first building a structure of just the types we want to select from
-	#	print "$a, $counter\n";
 		$a++;
 		my $prob = rand(1);
 		my $i = int(rand($nlSize-1));
@@ -155,22 +164,39 @@ sub powerNPUniform {
 		 	$nodeFrac > $prob && !defined($usedIdx{$i})	) {
 			$usedIdx{$i} = 1;
 			$counter++;
+			
+		#	print "NODE PROPERTIES: " . $nl->[$i]->power() . "\n";
+
+			####$this->distributePowerUniform($nl->[$i], $network, $pwr, $nodeFrac, $label,$distSize);
 		
-			$this->distributePowerUniform($nl->[$i], $network, $pwr, $nodeFrac, $label,$distSize);
+			$this->distributePowerUniform($nl->[$i], $network, $pwr, $nodeFrac, $label,$nlSize);
 		
 		}		
 	}
 
-	my $consvPower = ($pwr*$network->power())/($network->size('$2')+$network->size('$3'));
+	print "COUNTER RAN = " . $counter . "\n";
+
+#	my $consvPower = ($pwr*$network->power())/($network->size('$2')+$network->size('$3'));
 	
 	#my $nl = $this->network()->nodeList();
 	my $nl2 = $network->nodeList();
 	foreach my $nd (@{$nl2}) {
 		if ($nd->type() eq '$2' || $nd->type() eq '$3') {
+			my $p = $nd->power()*(1-$pwr);
+			
 			$nd->power($nd->power()*(1-$pwr));
+
+			#print "Subtracting out " . $p . "\n";
+			$totalSumPowerSubtracted+=$p;
+			
 		##	$nd->power( $nd->power() - $consvPower );
 		}
 	}
+
+	print "Sum Power Subtracted: " . $totalSumPowerSubtracted . "\n";
+	print "Sum Power Added: " . $totalSumPowerAdded . "\n";
+
+
 }
 ## LOOK OUT : CODE DUPLICATION
 sub powerNPProportional {
@@ -194,6 +220,7 @@ sub powerNPProportional {
 		#
 		if ( $nl->[$i]->type() eq '$1' &&
 		 	 $nodeFrac > $prob && !defined($usedIdx{$i})	) {
+		 	 	
 				$usedIdx{$i} = 1;
 				$counter++;
 				$this->distributePowerProportional($nl->[$i],$network, $pwr, $nodeFrac, $label, $distSize);
@@ -230,17 +257,33 @@ sub powerNPTest {
 sub distributePowerUniform {
 	my ($this, $node,$network, $pwr, $nodeFrac, $label, $distSize) = @_;
 
-	print "DIST SIZE: " . $distSize;
-	# First assumme uniform power
-	my $uniformPower = ( $network->power()*$pwr ) / ( $distSize * $nodeFrac );
-	print "---------------------------------\n";
-	print $network->power()*$pwr . "\n";
-	print $distSize . "\n";
-	print "UNIFORM POWER: " + $uniformPower . "\n";
-	$node->power($uniformPower);
-	$node->type($label);
-	
 
+	#print "DIST SIZE: " . $distSize;
+	# First assumme uniform power
+
+	####my $uniformPower = ( $network->power()*$pwr ) / ( $distSize * $nodeFrac );
+
+	my $uniformPower = ( $network->power()*$pwr ) / ( $distSize * $nodeFrac );
+
+	#print "Power Fraction " . $pwr . "\n";
+	#print "Node Fraction " . $nodeFrac . "\n";
+	#print "Number Distributed : " . $distSize * $nodeFrac . "\n";
+	#print "Distributed Power: " . $uniformPower;
+
+#	print "Expected increase in power: " . ($distSize*$uniformPower) . "\n";
+
+#	print "---------------------------------\n";
+	#print $network->power()*$pwr . "\n";
+	#print $distSize . "\n";
+#	print "UNIFORM POWER: " . $uniformPower . "\n";
+#	print "Total power: " . $network->getPower() . "\n";
+
+#	print "Node power before: " . $node->power() . "\n";
+	$node->power($uniformPower);
+#	print "Node power after: " . $node->power() . "\n";
+	$node->type($label);
+
+	$totalSumPowerAdded+=$uniformPower;
 }
 
 sub distributePowerProportional {
