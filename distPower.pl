@@ -54,7 +54,6 @@ sub main
 #		}
 #	}
 
-
 	foreach my $rule (@{$config->{rule}}) {
 		my $na = NodeAccessor->new();
 		$na->network($k);
@@ -71,6 +70,7 @@ sub main
 			my $accessorType = $rule->{region}->{accessorType};
 			my $objectType = $rule->{region}->{objectType};
 			my $regionLabel = $rule->{region}->{regionLabel};
+			my $excludeRange = $rule->{region}->{excludeRange};
 			
 			my $callback="";
 			
@@ -81,7 +81,17 @@ sub main
 				$callback = "powerNPUniform";
 			}
 			
-			my $region = $na->coordinateAccessor(int($x1),int($y1),int($x2),int($y2),$accessorType);
+
+			my $region;
+			#if (!defined($excludeRange)) {
+			#	$region = $na->coordinateAccessor(int($x1),int($y1),int($x2),int($y2),$accessorType);
+			#} else { 
+			#	if ($excludeRange eq "true") {
+					$region = $na->coordinateAccessor(int($x1),int($y1),int($x2),int($y2),$accessorType);
+			#	} else {
+			#		$region = $na->coordinateAccessor2(int($x1),int($y1),int($x2),int($y2),$accessorType);
+			#	}
+			#}
 
 =me 
 Example of how to use hasNode and getNode
@@ -118,14 +128,15 @@ TODO: Delete this comment once this code is documented and tests are written
 			# Objecttype can be anything. Currently I am seeting the object type to be 'region'
 			# So therefore multiple node types $6, $9, etc, can have a common object type associating them
 
-			$ntm->callback("setObjectType", [$objectType, ['$6', '$9'] ]);
+			#$ntm->callback("setObjectType", [$objectType, ['$6', '$9'] ]);
 			$ntm->callback("setRegionLabel", [$regionLabel] );
 			
 			my $str =  "THE TOTAL NETWORK POWER BEFORE: " . $k->getPower() . "\n";
+			print "THE TOTAL REGION POWER BEFORE: " . $region->getPower() . "\n";
 			$ntm->modify();
 			
 			print $str;
-			print "THE TOTAL REGION POWER: " . $region->getPower() . "\n";
+			print "THE TOTAL REGION POWER AFTER: " . $region->getPower() . "\n";
 			
 			# Merge the networks
 			$k->merge($region);
@@ -186,6 +197,7 @@ TODO: Delete this comment once this code is documented and tests are written
 sub createRegionFile {
 	my ($network, $fileName) = @_;
 
+	print "Createing the Region file\n";
 	die "Undefined Network" unless defined $network;
 	die "Undefined file name" unless defined $fileName;
 	
@@ -195,11 +207,13 @@ sub createRegionFile {
 	
 	my $fh = new IO::File "> $fileName";
     if (defined $fh) {
+    	#print "OK HERE: ". scalar(@$nl) ."\n";
         foreach my $n (@$nl) {
 			my $line = "";
-			if (defined $n->objectType() && $n->objectType eq "region") {
+			#if (defined $n->objectType() && $n->objectType() eq "region") {
+			if (defined $n->regionLabel() ) {
 				my $line = substr($n->name(), 1) ." ". $n->regionLabel() . " ". $n->type() ;
-				#print $fh $line . "\n";		
+				print $fh $line . "\n";		
 				my $pos = $fh->getpos;
 		        $fh->setpos($pos);
 			}

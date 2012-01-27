@@ -4,15 +4,22 @@
 	<region>
 		<objectType>region</objectType>
 		<range>0,0,400,400</range>
+		<regionLabel>R1</regionLabel>
+	</region>
+</rule>
+
+<rule type="buildRegion">
+	<region>
+		<objectType>region</objectType>
+		<range>250,250,400,400</range>
 		<power>0.7</power>
 		<node>0.4</node>
 		<distType>uniform</distType>
 		<label>$6</label>
 		
-		<regionLabel>R1</regionLabel>
+		<regionLabel>R2</regionLabel>
 	</region>
 </rule>
-
 
 <rule type="buildZone">
 	<zone>
@@ -21,6 +28,17 @@
 		<name>A</name>
 	</zone>
 </rule>
+
+
+<rule type="buildZone">
+	<zone>
+		<objectType>zone</objectType>
+		<range>250,250,400,400</range>
+		<name>B</name>
+	</zone>
+</rule>
+
+
 <!--
 <rule type="buildRegion">
 	<region>

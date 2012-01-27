@@ -45,6 +45,35 @@ sub coordinateAccessor {
 	return $nb->build($returnNet);
 }
 
+sub coordinateAccessor2 {
+	my ($this, $x1,$y1,$x2,$y2, $type ) = @_;
+
+	# loop thru networks
+	my $returnNet=[];
+	my $nodeList = $this->network()->nodeList();
+
+	foreach (@$nodeList) {
+		if (!defined($type)) {
+
+			if (!($x1 <= $_->x() && $y1 <= $_->y() &&
+				 $_->x() <= $x2 && $_->y() <= $y2)) {	
+					push @$returnNet, $_;
+			} 
+		} else {
+				if( !($x1 <= $_->x() && $y1 <= $_->y() &&
+					 $_->x() <= $x2 && $_->y() <= $y2) && 
+					$_->type() eq $type) { # More selective only grab those in a rectangle whose type is $type
+						push @$returnNet, $_;
+				}
+		}
+	}
+	
+	my $nb = NetworkBuilder->new();
+	
+	return $nb->build($returnNet);
+}
+
+
 ## NOT TESTED #########################
 sub typeAccessor {
 	my ($this, $type ) = @_;

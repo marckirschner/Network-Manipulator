@@ -13,6 +13,8 @@ sub build {
 	
 	# Build Connections between nodes
 	my $sumPower=0;
+	my $sumLoad=0;
+
 	for (my $i=0; $i<scalar(@$nodeList); $i++) {
 		## Network Construction
 		$nodeList->[$i];
@@ -25,6 +27,7 @@ sub build {
 		
 		## Network Analysis ##
 		$sumPower += $nodeList->[$i]->power();
+		$sumLoad += $nodeList->[$i]->load();
 	}
 	
 	# Next Build the Connection Matrix
@@ -36,6 +39,7 @@ sub build {
 	$k->nodeList($nodeList);
 	$k->conMatrix($matrix);
 	$k->power($sumPower);
+	$k->load($sumLoad);
 	
 	return $k;
 }

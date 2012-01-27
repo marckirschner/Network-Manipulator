@@ -9,6 +9,7 @@ no warnings;
 has 'nodeList' => (isa=>'ArrayRef', is=>'rw');
 has 'conMatrix' => (isa=>'HashRef', is=>'rw');
 has 'power' => (isa => 'Num', is=>'rw');
+has 'load' => (isa => 'Num', is=>'rw');
 
 #TODO: add getWithX, getWithY, getWithXY - will have to build map of coordinates to nodes
 
