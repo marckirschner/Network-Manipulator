@@ -145,23 +145,23 @@ sub powerNPUniform {
 	my $nlSize = scalar(@$nl);
 	my $a=0;
 
-	#my $distSize = $this->network()->size('$1');
+#	my $distSize = $this->network()->size('$1');
 
 	while ($counter<int($nodeFrac*$nlSize)) {
-	#while ($counter < int($nodeFrac*$distSize)) {
-		# This operation may be optimized by first building a structure of just the types we want to select from
-		$a++;
+		my $i = int(rand($nlSize));
 		my $prob = rand(1);
-		my $i = int(rand($nlSize-1));
-		
+
 		if ( $nl->[$i]->type() eq '$1' &&
-		 	$nodeFrac > $prob && !defined($usedIdx{$i})	) {
-			$usedIdx{$i} = 1;
-			$counter++;
-			
-			$this->distributePowerUniform($nl->[$i], $network, $pwr, $nodeFrac, $label,$nlSize);
-		
-		}		
+		 	 $nodeFrac > $prob && !defined($usedIdx{$i})	) {
+				$usedIdx{$i} = 1;
+				$counter++;		 	 	
+		 	 }
+	}
+
+	my $dNodeSize = scalar(keys %usedIdx);
+
+	for my $i (keys %usedIdx) {
+		$this->distributePowerUniform($nl->[$i], $network, $pwr, $nodeFrac, $label,$dNodeSize);	
 	}
 
 	my $nl2 = $network->nodeList();
@@ -175,7 +175,9 @@ sub powerNPUniform {
 		}
 	}
 }
+
 ## LOOK OUT : CODE DUPLICATION
+=me
 sub powerNPProportional {
 	my  ($this, $network, $pwr, $nodeFrac, $label) = @_;
 	my $nl = $this->network()->nodeList();
@@ -194,16 +196,21 @@ sub powerNPProportional {
 
 		if ( $nl->[$i]->type() eq '$1' &&
 		 	 $nodeFrac > $prob && !defined($usedIdx{$i})	) {
-
+#
 				$usedIdx{$i} = 1;
 				$counter++;		 	 	
 		 	 }
 	}
 
-	my $dNodeSize = scalar(keys %usedIdx);
+#	my $dNodeSize = scalar(keys %usedIdx);
 
-	for my $i (keys %usedIdx) {
-	#while ($counter<int($nodeFrac*$nlSize)) {
+	my $totalNodeLoad = 0;
+	foreach my $key (keys %usedIdx) {
+		$totalNodeLoad += $nl->[$usedIdx{$key} ]->load();
+	}
+
+	foreach my $i (keys %usedIdx) {
+#	while ($counter<int($nodeFrac*$nlSize)) {
 		# This operation may be optimized by first building a structure of just the types we want to select from
 		#my $i = int(rand($nlSize));
 		#my $prob = rand(1);
@@ -212,13 +219,13 @@ sub powerNPProportional {
 		# by the number of $1's multiplied by the fraction of generators
 		#
 		#
-	#	if ( $nl->[$i]->type() eq '$1' &&
-	#	 	 $nodeFrac > $prob && !defined($usedIdx{$i})	) {
+#		if ( $nl->[$i]->type() eq '$1' &&
+#		 	 $nodeFrac > $prob && !defined($usedIdx{$i})	) {
 		 	 	
-				$usedIdx{$i} = 1;
-				$counter++;
-				$this->distributePowerProportional($nl->[$i],$network, $pwr, $nodeFrac, $label, $dNodeSize);
-	#		}		
+#				$usedIdx{$i} = 1;
+#				$counter++;
+				$this->distributePowerProportional($nl->[$i],$network, $pwr, $nodeFrac, $label, $nlSize, $totalNodeLoad);
+#			}		
 	}
 
 	foreach my $nd (@{$nl}) {
@@ -227,6 +234,53 @@ sub powerNPProportional {
 		}
 	}
 }
+=cut
+
+sub powerNPProportional {
+	my  ($this, $network, $pwr, $nodeFrac, $label) = @_;
+	my $nl = $this->network()->nodeList();
+	
+	my $counter=0;
+	my %usedIdx;
+	my $nlSize = scalar(@$nl);
+	my $a=0;
+
+#	my $distSize = $this->network()->size('$1');
+
+	while ($counter<int($nodeFrac*$nlSize)) {
+		my $i = int(rand($nlSize));
+		my $prob = rand(1);
+
+		if ( $nl->[$i]->type() eq '$1' &&
+		 	 $nodeFrac > $prob && !defined($usedIdx{$i})	) {
+				$usedIdx{$i} = 1;
+				$counter++;		 	 	
+		 	 }
+	}
+
+	my $dNodeSize = scalar(keys %usedIdx);
+
+	my $totalNodeLoad = 0;
+	foreach my $key (keys %usedIdx) {
+		$totalNodeLoad += $nl->[$usedIdx{$key} ]->load();
+	}
+
+	for my $i (keys %usedIdx) {
+		$this->distributePowerProportional($nl->[$i],$network, $pwr, $nodeFrac, $label, $nlSize, $totalNodeLoad);
+	}
+
+	my $nl2 = $network->nodeList();
+	foreach my $nd (@{$nl2}) {
+		if ($nd->type() eq '$2' || $nd->type() eq '$3') {
+			my $p = $nd->power()*(1-$pwr);
+			
+			$nd->power($nd->power()*(1-$pwr));
+
+			$totalSumPowerSubtracted+=$p;
+		}
+	}
+}
+
 
 sub createZone {
 	my ($this, $name) = @_;
@@ -251,7 +305,7 @@ sub powerNPTest {
 sub distributePowerUniform {
 	my ($this, $node,$network, $pwr, $nodeFrac, $label, $distSize) = @_;
 
-	my $uniformPower = ( $network->power()*$pwr ) / ( int($distSize * $nodeFrac) );
+	my $uniformPower = ( $network->power()*$pwr ) / $distSize;#( int($distSize * $nodeFrac) );
 
 	$node->power($uniformPower);
 
@@ -261,17 +315,17 @@ sub distributePowerUniform {
 }
 
 sub distributePowerProportional {
-	my ($this, $node,$network, $pwr, $nodeFrac, $label, $distSize) = @_;
-	
-#	my $proportionality = $node->load() / $network->load();
-#	my $proportionalPower = $network->power()*$proportionality;	
-	
-#	$node->power($proportionalPower);
-#	$node->type($label);
+	my ($this, $node,$network, $pwr, $nodeFrac, $label, $distSize, $totalNodeLoad) = @_;
 
-	my $uniformPower = ( $network->power()*$pwr ) / ( $distSize * $nodeFrac );
+	my $P = $network->power();
+	print "THE POWER IS " . $P . "\n";
+	my $mu = $pwr;
+	my $rho = $mu*$P;
+	my $epsilon = $node->load() / $totalNodeLoad;
 
-	$node->power($uniformPower);
+	my $newNodePower = $epsilon * $rho;
+
+	$node->power($newNodePower);
 
 	$node->type($label);
 }

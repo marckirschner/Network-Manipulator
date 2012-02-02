@@ -14,7 +14,7 @@
 		<range>250,250,400,400</range>
 		<power>0.7</power>
 		<node>0.4</node>
-		<distType>uniform</distType>
+		<distType>proportional</distType>
 		<label>$6</label>
 		
 		<regionLabel>R2</regionLabel>
