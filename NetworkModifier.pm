@@ -9,7 +9,9 @@ has 'ruleMap' => (isa=>'HashRef', is=>'rw');
 
 my $totalSumPowerSubtracted=0;
 my $totalSumPowerAdded=0;
-
+my $E = 0;
+my $NUM_COUNT=0;
+my $totalNodeLoadCalc = 0;
 sub BUILD {
 	my ($this) = @_;
 	$this->initRuleMap();
@@ -176,66 +178,7 @@ sub powerNPUniform {
 	}
 }
 
-## LOOK OUT : CODE DUPLICATION
-=me
-sub powerNPProportional {
-	my  ($this, $network, $pwr, $nodeFrac, $label) = @_;
-	my $nl = $this->network()->nodeList();
-	
-	my $counter=0;
-	my %usedIdx;
-	my $nlSize = scalar(@$nl);
-	
-	my $distSize = $this->network()->size('$1');
-
-	#$counter<int($nodeFrac*$nlSize)
-
-	while ($counter<int($nodeFrac*$nlSize)) {
-		my $i = int(rand($nlSize));
-		my $prob = rand(1);
-
-		if ( $nl->[$i]->type() eq '$1' &&
-		 	 $nodeFrac > $prob && !defined($usedIdx{$i})	) {
-#
-				$usedIdx{$i} = 1;
-				$counter++;		 	 	
-		 	 }
-	}
-
-#	my $dNodeSize = scalar(keys %usedIdx);
-
-	my $totalNodeLoad = 0;
-	foreach my $key (keys %usedIdx) {
-		$totalNodeLoad += $nl->[$usedIdx{$key} ]->load();
-	}
-
-	foreach my $i (keys %usedIdx) {
-#	while ($counter<int($nodeFrac*$nlSize)) {
-		# This operation may be optimized by first building a structure of just the types we want to select from
-		#my $i = int(rand($nlSize));
-		#my $prob = rand(1);
-		#
-		# Should multiply Total System Power by power fraction and divide this
-		# by the number of $1's multiplied by the fraction of generators
-		#
-		#
-#		if ( $nl->[$i]->type() eq '$1' &&
-#		 	 $nodeFrac > $prob && !defined($usedIdx{$i})	) {
-		 	 	
-#				$usedIdx{$i} = 1;
-#				$counter++;
-				$this->distributePowerProportional($nl->[$i],$network, $pwr, $nodeFrac, $label, $nlSize, $totalNodeLoad);
-#			}		
-	}
-
-	foreach my $nd (@{$nl}) {
-		if ($nd->type() eq '$2' || $nd->type() eq '$3') {
-			$nd->power($nd->power()*(1-$pwr));
-		}
-	}
-}
-=cut
-
+=m
 sub powerNPProportional {
 	my  ($this, $network, $pwr, $nodeFrac, $label) = @_;
 	my $nl = $this->network()->nodeList();
@@ -268,6 +211,61 @@ sub powerNPProportional {
 	for my $i (keys %usedIdx) {
 		$this->distributePowerProportional($nl->[$i],$network, $pwr, $nodeFrac, $label, $nlSize, $totalNodeLoad);
 	}
+
+	my $nl2 = $network->nodeList();
+	foreach my $nd (@{$nl2}) {
+		if ($nd->type() eq '$2' || $nd->type() eq '$3') {
+			my $p = $nd->power()*(1-$pwr);
+			
+			$nd->power($nd->power()*(1-$pwr));
+
+			$totalSumPowerSubtracted+=$p;
+		}
+	}
+}
+=cut
+
+sub powerNPProportional {
+	my  ($this, $network, $pwr, $nodeFrac, $label) = @_;
+	my $nl = $this->network()->nodeList();
+	
+	my $counter=0;
+	my %usedIdx;
+	my $nlSize = scalar(@$nl);
+	my $a=0;
+
+#	my $distSize = $this->network()->size('$1');
+
+	while ($counter<int($nodeFrac*$nlSize)) {
+		my $i = int(rand($nlSize));
+		my $prob = rand(1);
+
+		if ( $nl->[$i]->type() eq '$1' &&
+		 	 $nodeFrac > $prob && !defined($usedIdx{$i})	) {
+				$usedIdx{$i} = 1;
+				$counter++;		 	 	
+		 	 }
+	}
+
+	my $dNodeSize = scalar(keys %usedIdx);
+
+	print " NODE LOADS-----------------------------------\n";
+	my $totalNodeLoad = 0;
+	foreach my $key (keys %usedIdx) {
+		#print "KEY IS : " . $key . "\n";
+		$totalNodeLoad += $nl->[$key ]->load();
+		#print "". $nl->[$usedIdx{$key} ]->load() . "\n";
+	}
+
+	print "TOTAL NODE LOAD CALCULATE: " . $totalNodeLoad . "\n";
+
+	print "NUMBER OF DIST NODES: " . scalar(keys %usedIdx) . "\n";
+
+	for my $key (keys %usedIdx) {
+		$this->distributePowerProportional($nl->[$key],$network, $pwr, $nodeFrac, $label, $nlSize, $totalNodeLoad);
+	}
+
+	print "THE CALCULATED NODE LOAD AFTER ITERATION: " . $totalNodeLoadCalc . "\n";
 
 	my $nl2 = $network->nodeList();
 	foreach my $nd (@{$nl2}) {
@@ -318,14 +316,26 @@ sub distributePowerProportional {
 	my ($this, $node,$network, $pwr, $nodeFrac, $label, $distSize, $totalNodeLoad) = @_;
 
 	my $P = $network->power();
-	print "THE POWER IS " . $P . "\n";
+	#print "THE POWER IS " . $P . "\n";
 	my $mu = $pwr;
 	my $rho = $mu*$P;
 	my $epsilon = $node->load() / $totalNodeLoad;
 
+	$totalNodeLoadCalc+=$node->load();
+
+	$E += $epsilon;
+	$NUM_COUNT++;
+
+	print $node->load() . "\n";
+
+	#print "TOTAL NODE LOAD: " . $totalNodeLoad . "\n";
+	#print "E: " . $E . "\n";
+	#print "NUM_COUNT: " . $NUM_COUNT . "\n";
+
 	my $newNodePower = $epsilon * $rho;
 
 	$node->power($newNodePower);
+
 
 	$node->type($label);
 }

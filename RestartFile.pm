@@ -88,13 +88,13 @@ sub toString {
 	
 	my $restartText="";
 	for (my $i=0; $i<scalar(@{$sec1}); $i++) {
-		my $str = join(',', @{$sec1->[$i]});
+		my $str = join(' ', @{$sec1->[$i]});
 		$restartText.=$str."\n";
 	}
 	
 	$restartText.="\n";
 	for (my $i=0; $i<scalar(@{$sec2}); $i++) {
-		my $str = join(',', @{$sec2->[$i]});
+		my $str = join(' ', @{$sec2->[$i]});
 		$restartText.=$str."\n";
 	}
 	return $restartText;
