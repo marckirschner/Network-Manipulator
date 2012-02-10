@@ -148,15 +148,15 @@ sub toRestartFile {
 		
 		my $str='['.$conIds->[0];
 		for (my $i=1; $i<scalar(@$conIds); $i++) {
-	 		$str .= ','.$conIds->[$i];
+	 		$str .= ', '.$conIds->[$i];
 		}
 		
-		$str .= ','. $conIds->[scalar($conIds)-1] . ']';
+		$str .= ', '. $conIds->[scalar($conIds)-1] . ']';
 		
-		$str=~ s/\,\]/]/;
+		$str=~ s/\, \]/]/;
 	
 		push @{$sec1}, [$nl->[$i]->type(), $nl->[$i]->load(), $nl->[$i]->power(),$nl->[$i]->power(),
-							$nl->[$i]->name(), '('.$nl->[$i]->x() .',' . $nl->[$i]->y() . ')',
+							$nl->[$i]->name(), '('.$nl->[$i]->x() .', ' . $nl->[$i]->y() . ')',
 							$str];
 			
 		push (@{$coords}, [ $nl->[$i]->x(),$nl->[$i]->y() ]);

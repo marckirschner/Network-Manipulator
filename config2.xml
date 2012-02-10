@@ -11,9 +11,9 @@
 <rule type="buildRegion">
 	<region>
 		<objectType>region</objectType>
-		<range>0,0,100,100</range>
+		<range>0,0,200,230</range>
 		<power>0.1</power>
-		<node>0.4</node>
+		<node>0.6</node>
 		<distType>proportional</distType>
 		<label>$6</label>
 		
