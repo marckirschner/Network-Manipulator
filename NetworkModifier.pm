@@ -101,8 +101,12 @@ sub applyRegion {
 
 sub applyZone {
 	my ($this, $zone) = @_;
+	print "applyZone called!\n";
 		my $nl = $this->network()->nodeList();
+
+		print "SIZE OF ZONE: " . scalar(@{$nl}) . "\n";
 		foreach my $nd (@{$nl}) {
+			print "Applying zone: $zone\n";
 			$nd->zone($zone);
 		}
 }

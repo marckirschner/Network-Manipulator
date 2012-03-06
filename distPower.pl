@@ -145,7 +145,8 @@ TODO: Delete this comment once this code is documented and tests are written
 		
 		if ($rule->{type} eq 'buildZone') {
 			$checks{region} = 1;
-			my ($x1,$x2,$y1,$y2) = split(',', $rule->{zone}->{range});
+			my ($x1,$y1,$x2,$y2) = split(',', $rule->{zone}->{range});
+		
 			my $name = $rule->{zone}->{name};
 			my $callback = "createZone";
 						
