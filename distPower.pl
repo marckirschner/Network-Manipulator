@@ -187,7 +187,7 @@ TODO: Delete this comment once this code is documented and tests are written
 	print FILE $text;
 	close FILE;
 	
-	createRegionFile($k, "RegionFile.txt");
+	createRegionFile($k, "RegionDescription.xml");
 	
 	# Create Node File
 	
@@ -207,17 +207,28 @@ sub createRegionFile {
 	
 	my $fh = new IO::File "> $fileName";
     if (defined $fh) {
-    	#print "OK HERE: ". scalar(@$nl) ."\n";
+
+    	print $fh "<xml>\n";		
         foreach my $n (@$nl) {
 			my $line = "";
-			#if (defined $n->objectType() && $n->objectType() eq "region") {
+
 			if (defined $n->regionLabel() ) {
-				my $line = substr($n->name(), 1) ." ". $n->regionLabel() . " ". $n->type() ;
+
+				my $xmlString ="".
+					"<region>"
+					."<nodeNumber>". substr($n->name(), 1)."</nodeNumber>"
+					."<regionName>". $n->regionLabel()."</regionName>"
+					."<nodeType>".$n->type()."</nodeType>"
+					."</region>";
+
+				my $line = $xmlString;
 				print $fh $line . "\n";		
 				my $pos = $fh->getpos;
 		        $fh->setpos($pos);
 			}
 		}
+		print $fh "</xml>";
+
         undef $fh;       # automatically closes the file
     }
  
