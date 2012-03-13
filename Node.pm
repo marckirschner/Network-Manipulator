@@ -16,6 +16,11 @@ has 'region' =>(isa=>'Str', is=>'rw');
 has 'zone' =>(isa=>'Str', is=>'rw');
 has 'objectType' => (isa=>'Str', is=>'rw');
 has 'regionLabel' => (isa=>'Str', is=>'rw');
+has 'prob' => (isa=>'Str', is=>'rw');
+has 'powerRatio' => (isa=>'Str', is=>'rw');
+has 'regionType' => (isa=>'Str', is=>'rw');
+
+
 
 sub points {
 	my ($this, $coords) = @_;

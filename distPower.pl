@@ -70,6 +70,11 @@ sub main
 			my $accessorType = $rule->{region}->{accessorType};
 			my $objectType = $rule->{region}->{objectType};
 			my $regionLabel = $rule->{region}->{regionLabel};
+			
+			my $powerRatio = $rule->{region}->{powerRatio};
+			my $prob = $rule->{region}->{prob};
+			my $regionType = $rule->{region}->{regionType};
+
 			my $excludeRange = $rule->{region}->{excludeRange};
 			
 			my $callback="";
@@ -129,7 +134,7 @@ TODO: Delete this comment once this code is documented and tests are written
 			# So therefore multiple node types $6, $9, etc, can have a common object type associating them
 
 			#$ntm->callback("setObjectType", [$objectType, ['$6', '$9'] ]);
-			$ntm->callback("setRegionLabel", [$regionLabel] );
+			$ntm->callback("setRegionLabel", [$regionLabel, $prob, $powerRatio, $regionType] );
 			
 			my $str =  "THE TOTAL NETWORK POWER BEFORE: " . $k->getPower() . "\n";
 			print "THE TOTAL REGION POWER BEFORE: " . $region->getPower() . "\n";
@@ -214,14 +219,17 @@ sub createRegionFile {
 			my $line = "";
 
 			if (defined $n->regionLabel() ) {
-
+=m
 				my $xmlString ="".
 					"<region>"
 					."<nodeNumber>". substr($n->name(), 1)."</nodeNumber>"
 					."<regionName>". $n->regionLabel()."</regionName>"
 					."<nodeType>".$n->type()."</nodeType>"
 					."</region>";
+=cut
 
+				my $xmlString ="".
+				"<region nodeNumber='".substr($n->name(), 1)."' regionName='".$n->regionLabel()."' nodeType='".$n->type()."' prob='".$n->prob()."' powerRatio='".$n->powerRatio()."' regionType='".$n->regionType() ."' ></region>";
 				my $line = $xmlString;
 				print $fh $line . "\n";		
 				my $pos = $fh->getpos;

@@ -127,11 +127,13 @@ sub setObjectType {
 }
 
 sub setRegionLabel {
-		my ($this, $regionLabel) = @_;
+		my ($this, $regionLabel, $prob, $powerRatio, $regionType) = @_;
 			my $nl = $this->network()->nodeList();
 			foreach my $nd (@{$nl}) {
 					$nd->regionLabel($regionLabel);
-				
+					$nd->prob($prob);
+					$nd->powerRatio($powerRatio);
+					$nd->regionType($regionType);
 			}
 }
 

@@ -5,6 +5,9 @@
 		<objectType>region</objectType>
 		<range>0,0,400,400</range>
 		<regionLabel>R1</regionLabel>
+		<prob>0.0</prob>
+		<powerRatio>1.0</powerRatio>
+		<regionType>background</regionType>
 	</region>
 </rule>
 
@@ -16,8 +19,10 @@
 		<node>0.6</node>
 		<distType>proportional</distType>
 		<label>$6</label>
-		
+		<prob>0.8</prob>
+		<powerRatio>0.4</powerRatio>
 		<regionLabel>R2</regionLabel>
+		<regionType>GeneratorPowerRegion</regionType>
 	</region>
 </rule>
 
